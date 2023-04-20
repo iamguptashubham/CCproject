@@ -9,6 +9,8 @@ import streamlit as st
 import pickle
 from PIL import Image
 import random
+import datetime
+from azure.cosmos import exceptions, CosmosClient
 
 st.set_option('deprecation.showfileUploaderEncoding',False)
 
@@ -47,22 +49,45 @@ if st.button('Predict'):
   container_client = blob_service_client.get_container_client(container_name)
 
 # Upload a file to the container
-  blob_name = y_out + "_" + str(random.randint(1, 10))
+  blob_name = y_out + "_" + str(random.randint(1, 100))
   blob_client = container_client.get_blob_client(blob_name)
   with BytesIO() as output:
         imgName.save(output, format="JPEG")
         data = output.getvalue()
-        blob_client.upload_blob(data, overwrite=False)
+        blob_client.upload_blob(data, overwrite=True)
 
   # Download the test file from the blob
   downloaded_blob = blob_client.download_blob()
   downloaded_data = downloaded_blob.content_as_bytes()
 
-# Verify that the downloaded data matches the original test file
-  if downloaded_data == data:
-      print("Connection test succeeded.")
-  else:
-      print("Connection test failed.")
+# Get the existing metadata
+  metadata = imgName.info
+
+# Add the timestamp to the metadata
+  timestamp = datetime.datetime.now().strftime('%Y:%m:%d %H:%M:%S')
+  metadata['DateTime'] = timestamp
+
+  # Define your Cosmos DB account information
+  url = 'https://imagedata.documents.azure.com:443/'
+  key = 'WZv2z7T2HU6Ii93VrCipfKi7ifldJFGG5a7Ixcdp3ALGGoXimkrPzrxr9GsfWfUpbd1YhMGbOkFLACDbqlUYXw=='
+  database_name = 'imgdata'
+  container_name = 'container1'
+
+# Create a Cosmos DB client
+  client = CosmosClient(url, credential=key)
+
+# Get a reference to the database and container
+  database = client.get_database_client(database_name)
+  container = database.get_container_client(container_name)
+
+  item = {
+    'id':blob_name,
+    'metadata': metadata,
+    }
+
+# Insert the item into the container
+  response = container.create_item(body=item)
+
 
 
 st.text('Cloud Computing Project of Group-1 D12C')
