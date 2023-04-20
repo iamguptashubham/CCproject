@@ -10,7 +10,6 @@ import pickle
 from PIL import Image
 import random
 import datetime
-import json
 from azure.cosmos import exceptions, CosmosClient
 
 st.set_option('deprecation.showfileUploaderEncoding',False)
@@ -83,11 +82,19 @@ if st.button('Predict'):
 
   item = {
     'id':blob_name,
-    'metadata': metadata,
+    'jfif': metadata.get('jfif'),
+    'jfif_version': metadata.get('jfif_version'),
+    'dpi': metadata.get('dpi'),
+    'jfif_unit': metadata.get('jfif_unit', 'default_value_if_key_does_not_exist'),
+    'jfif_density': metadata.get('jfif_density'),
+    'progression': metadata.get('progression'),
+    'progressive': metadata.get('progressive'),
+    'DateTime': metadata.get('DateTime'),
+
     }
-  json_string = json.dumps(item)
+
 # Insert the item into the container
-  response = container.create_item(body=json.loads(json_string))
+  response = container.create_item(body=item)
 
 
 
