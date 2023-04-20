@@ -10,6 +10,7 @@ import pickle
 from PIL import Image
 import random
 import datetime
+import json
 from azure.cosmos import exceptions, CosmosClient
 
 st.set_option('deprecation.showfileUploaderEncoding',False)
@@ -84,9 +85,9 @@ if st.button('Predict'):
     'id':blob_name,
     'metadata': metadata,
     }
-
+  json_string = json.dumps(item)
 # Insert the item into the container
-  response = container.create_item(body=item)
+  response = container.create_item(body=json.loads(json_string))
 
 
 
