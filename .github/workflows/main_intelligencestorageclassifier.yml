@@ -60,4 +60,4 @@ jobs:
         with:
           app-name: 'IntelligenceStorageClassifier'
           slot-name: 'Production'
-          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_550A034C7DBE4FBABE2E9212F2B6B1EC }}
+          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_EECCE0C76B2A4FCB9C92DB38EF95F242 }}
